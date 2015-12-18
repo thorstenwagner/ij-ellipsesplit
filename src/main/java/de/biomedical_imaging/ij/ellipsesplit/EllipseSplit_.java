@@ -349,15 +349,15 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		}
 		
 		gd.addChoice("Binary splitted image", splittedImageChoice, splittedImageChoice[0]);
-		gd.addCheckbox("Add_to_Manager", true);
+		gd.addCheckbox("Add_to_manager", true);
 		gd.addCheckbox("Add_to_results_table", true);
 		
 		gd.addCheckbox("Merge_when_relativ_overlap_larger_than_threshold", true);
-		gd.addSlider("Overlap Threshold in %", 0, 100, 95);
+		gd.addSlider("Overlap threshold in %", 0, 100, 95);
 		gd.addMessage("Geometric filters:");
 		gd.addStringField("Major axis length", "0-Infinity");
 		gd.addStringField("Minor axis length", "0-Infinity");
-		gd.addStringField("Aspect Ratio", "1-Infinity");
+		gd.addStringField("Aspect ratio", "1-Infinity");
 		gd.addHelp("http://fiji.sc/Ellipse_split");
 		gd.addPreviewCheckbox(pfr);
 		gd.addDialogListener(this);
