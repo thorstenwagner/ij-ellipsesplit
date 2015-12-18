@@ -340,7 +340,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
 		splittedImage=null;
 		this.imp = imp;
-		GenericDialog gd = new GenericDialog("Split & Ellipse Fit");
+		GenericDialog gd = new GenericDialog("Ellipse Split");
 		int windowNumber = WindowManager.getImageTitles().length;
 		String[] splittedImageChoice = new String[windowNumber+1];
 		splittedImageChoice[0] = "Use standard watershed";
@@ -358,6 +358,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addStringField("Major axis length", "0-Infinity");
 		gd.addStringField("Minor axis length", "0-Infinity");
 		gd.addStringField("Aspect Ratio", "1-Infinity");
+		gd.addHelp("http://fiji.sc/Ellipse_split");
 		gd.addPreviewCheckbox(pfr);
 		gd.addDialogListener(this);
 		gd.showDialog();
