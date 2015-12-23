@@ -130,8 +130,8 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 				results.addValue("Y", e.getY());
 				results.addValue("Length long axis", e.getLengthLongAxis()*2);
 				results.addValue("Length short axis", e.getLengthShortAxis()*2);
-				results.addValue("Aspect Ratio", 1.0/e.getAspectRatio());
-				results.addValue("Rotation Angle", e.getRotationAngle());
+				results.addValue("Aspect ratio", 1.0/e.getAspectRatio());
+				results.addValue("Rotation angle", e.getRotationAngle());
 				
 			}
 		}
