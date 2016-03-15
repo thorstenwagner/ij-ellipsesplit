@@ -76,12 +76,15 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	
 	public EllipseSplit_() {
 		instance = this;
+		addToManager = false;
+		addToResultsTable = false;
+		merge = false;
+		overlappingThreshold = 1;
+		useSplitImage = false;
 	}
 	
 	@Override
 	public int setup(String arg, ImagePlus imp) {
-		//Get Configuration
-		
 		if(arg=="final"){
 			if(addToResultsTable){
 				results.show("Results");
@@ -101,9 +104,10 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 
 	@Override
 	public void run(ImageProcessor ip) {
+		// Split ellipses
 		ManyEllipses ellipses = splitAndFitEllipse(ip, addToManager, addToResultsTable, merge, overlappingThreshold);
 	
-		//Output
+		// Output
 		RoiManager  rm = RoiManager.getInstance();
 		if(rm==null && addToManager){
 			rm = new RoiManager();
@@ -132,6 +136,8 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 				results.addValue("Length short axis", e.getLengthShortAxis()*2);
 				results.addValue("Aspect ratio", 1.0/e.getAspectRatio());
 				results.addValue("Rotation angle", e.getRotationAngle());
+				results.addValue("R", e.getRValue());
+				//IJ.log("Distance: " + e.shortestDistanceToPoint(0, 0));
 				
 			}
 		}
@@ -143,7 +149,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	/**
 	 * Diese Methode trennt binäre Objekt mit einer einfachen Wasserscheidentransforamtion. Anschließend fittet sie
 	 * zu allen Konturen eine Ellipse. Dabei lässt sie Konturen aus, die durch die Wasserscheidentransformation entstanden sind.
-	 * 
+	 * This method splits binary objects first by a 
 	 * @param ip Binary image
 	 * @param addToManager True when the ellipses should be added to the ROI Manager
 	 * @param addToResultsTable True when the ellipses should be added to the Results Table
@@ -169,11 +175,12 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		ManyBlobs mb = new ManyBlobs(new ImagePlus("",ipForBlobDetection));
 		mb.setBackground(0);
 		mb.findConnectedComponents();
+		
 		ImageCalculator calculateImages = new ImageCalculator();
 		ImagePlus extractedSeparatorsImp = calculateImages.run("XOR create",new ImagePlus("",ipForBlobDetection) , origImp);	
 		
 		ManyEllipses ellipses = new ManyEllipses();
-		
+	
 		//Calculate Ellipses
 		for (Blob blob : mb) {
 			
@@ -183,13 +190,15 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 			fillSeperatorFreeXYCoordinates(contour, xpoints, ypoints, extractedSeparatorsImp.getProcessor());
 			
 			if(xpoints.size()>3){
+				
 				Ellipse ellipse = fitEllipse(xpoints, ypoints);
 				if(ellipse != null){
+					System.out.println("done");
 					ellipses.add(ellipse);
 				}
 			}
 		}
-	
+
 		//Remove bad ellipse fits
 		for (int i = 0; i < ellipses.size(); i++) {
 			Ellipse e = ellipses.get(i);
@@ -209,6 +218,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		}
 		
 		//Apply geometric filters
+		
 		for (int i = 0; i < ellipses.size(); i++) {
 			Ellipse e = ellipses.get(i);
 			
@@ -219,6 +229,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 				i--;
 			}
 		}
+		
 		return ellipses;
 	}
 	
@@ -334,6 +345,8 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		}
 		return false;
 	}
+	
+	
 	
 	private boolean checkPixelValue(ImageProcessor ip, int x, int y, int value){
 		if(x<0 || x >= ip.getWidth() || y < 0 || y >= ip.getHeight()){

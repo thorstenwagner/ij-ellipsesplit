@@ -77,7 +77,7 @@ public class ResultsTableSelectionDrawer implements MouseListener {
 	
 	public void update(int start, int end){
 		
-		if(selectionStart!= start || selectionStop != end ){
+		if( (selectionStart!= start || selectionStop != end) && imp.isVisible() ){
 			selectionStart = start;
 			selectionStop = end;
 			if(selectionStart>=0){

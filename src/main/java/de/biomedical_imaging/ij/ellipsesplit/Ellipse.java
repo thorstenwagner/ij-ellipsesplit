@@ -30,10 +30,14 @@ import ij.measure.Calibration;
 import ij.plugin.RoiRotator;
 
 import java.awt.Polygon;
+import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.doube.geometry.FitEllipse;
+
+import de.biomedical_imaging.ij.ellipsesplit.CircleFitter.LocalException;
+
 
 
 /**
@@ -235,6 +239,63 @@ public class Ellipse {
 					", AR= " + df.format(aspectRatio) +
 				"]";
 	}	
+	
+	
+	public double[] shortestDistanceToPoint(double xp, double yp){
+		 double deltaPhi = 2*Math.PI/getPolygon().npoints;
+		 double parPhi = 0;
+		 double minDistance = Double.MAX_VALUE;
+		 Polygon pol = getPolygon();
+		 int minIndex = 0;
+		 for(int i = 0; i < pol.npoints; i++){
+			 double dist = Math.pow( xp - pol.xpoints[i], 2)+Math.pow( yp - pol.ypoints[i], 2);
+			 if(dist < minDistance){
+				 minDistance = dist;
+				 minIndex = i;
+			 }
+			 parPhi += deltaPhi;
+		 }
+		 double[] res = {Math.sqrt(minDistance),minIndex};
+		 return res;
+	}
+	
+	public double getRValue(){
+		double dataDistanceFromMean = 0;
+		double dataDistanceFromModel = 0;
+		double xMean= 0;
+		double yMean = 0;
+		
+		// fit a circle to the test points
+		Point2D.Double[] points = new Point2D.Double[xpoints.size()];
+		for(int i = 0; i < xpoints.size(); i++){
+			points[i] = new Point2D.Double(xpoints.get(i), ypoints.get(i));
+		}
+		CircleFitter fitter = new CircleFitter();
+		try {
+			fitter.initialize(points);
+			// minimize the residuals
+			fitter.minimize(100, 0.1, 1.0e-12);
+		} catch (LocalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		for(int i = 0; i < xpoints.size(); i++){
+			xMean += xpoints.get(i);
+			yMean += ypoints.get(i);
+		}
+		xMean = xMean / xpoints.size();
+		yMean = yMean / ypoints.size();
+		for( int i = 0; i < xpoints.size(); i++){
+			double[] s = shortestDistanceToPoint(xpoints.get(i), ypoints.get(i));
+			dataDistanceFromModel += s[0]*s[0];
+			dataDistanceFromMean += Math.pow(xpoints.get(i)-xMean, 2)+Math.pow(ypoints.get(i)-yMean, 2);
+		}
+		
+		return 1.0 - dataDistanceFromModel/dataDistanceFromMean;
+	}
 	
 	@Override
 	public boolean equals(Object obj) {
