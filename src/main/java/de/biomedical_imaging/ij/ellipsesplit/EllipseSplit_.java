@@ -60,7 +60,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	private boolean merge;
 	private double overlappingThreshold;
 	private boolean useSplitImage;
-	
+	private boolean removeOnEdge;
 	private ArrayList<ManyEllipses> allEllipses;
 	private ImagePlus splittedImage;
 	private ImagePlus imp;
@@ -81,6 +81,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		merge = false;
 		overlappingThreshold = 1;
 		useSplitImage = false;
+		removeOnEdge = false;
 	}
 	
 	@Override
@@ -105,7 +106,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	@Override
 	public void run(ImageProcessor ip) {
 		// Split ellipses
-		ManyEllipses ellipses = splitAndFitEllipse(ip, addToManager, addToResultsTable, merge, overlappingThreshold);
+		ManyEllipses ellipses = splitAndFitEllipse(ip, addToManager, addToResultsTable, merge,removeOnEdge, overlappingThreshold);
 	
 		// Output
 		RoiManager  rm = RoiManager.getInstance();
@@ -158,7 +159,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	 * then this value, then the ellipses will be merged. The value has to be between 0 and 1. 
 	 * @return All fitted ellipses
 	 */
-	public ManyEllipses splitAndFitEllipse(ImageProcessor ip, boolean addToManager,boolean addToResultsTable, boolean merge, double overlappingThreshold){
+	public ManyEllipses splitAndFitEllipse(ImageProcessor ip, boolean addToManager,boolean addToResultsTable, boolean merge, boolean removeOnEdge,double overlappingThreshold){
 
 		ImagePlus origImp = new ImagePlus("",ip.duplicate());
 		ImageProcessor ipForBlobDetection;
@@ -176,14 +177,15 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		mb.setBackground(0);
 		mb.findConnectedComponents();
 		
-		ArrayList<Blob> blobsOnEdges = new ArrayList<Blob>();
-		for (Blob blob : mb) {
-			if(blob.isOnEdge(ipForBlobDetection)){
-				blobsOnEdges.add(blob);
+		if(removeOnEdge){
+			ArrayList<Blob> blobsOnEdges = new ArrayList<Blob>();
+			for (Blob blob : mb) {
+				if(blob.isOnEdge(ipForBlobDetection)){
+					blobsOnEdges.add(blob);
+				}
 			}
+			mb.removeAll(blobsOnEdges);
 		}
-		mb.removeAll(blobsOnEdges);
-		
 		ImageCalculator calculateImages = new ImageCalculator();
 		ImagePlus extractedSeparatorsImp = calculateImages.run("XOR create",new ImagePlus("",ipForBlobDetection) , origImp);	
 		
@@ -395,7 +397,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addChoice("Binary splitted image", splittedImageChoice, splittedImageChoice[0]);
 		gd.addCheckbox("Add_to_manager", true);
 		gd.addCheckbox("Add_to_results_table", true);
-		
+		gd.addCheckbox("Remove blobs on edge", false);
 		gd.addCheckbox("Merge_when_relativ_overlap_larger_than_threshold", true);
 		gd.addSlider("Overlap threshold in %", 0, 100, 95);
 		gd.addMessage("Geometric filters:");
@@ -412,6 +414,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		int choiceIndex = gd.getNextChoiceIndex();
 		addToManager = gd.getNextBoolean();
 		addToResultsTable = gd.getNextBoolean();
+		removeOnEdge = gd.getNextBoolean();
 		merge = gd.getNextBoolean();
 		overlappingThreshold = gd.getNextNumber()/100.0;
 		majorAxisBounds = stringIntervalToArray(gd.getNextString(), "0-Infinity");
@@ -476,6 +479,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		int choiceIndex = gd.getNextChoiceIndex();
 		addToManager = gd.getNextBoolean();
 		addToResultsTable = gd.getNextBoolean();
+		removeOnEdge = gd.getNextBoolean();
 		merge = gd.getNextBoolean();
 		overlappingThreshold = gd.getNextNumber()/100.0;
 		majorAxisBounds = stringIntervalToArray(gd.getNextString(), "0-Infinity");
