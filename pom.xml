@@ -13,7 +13,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<groupId>de.biomedical-imaging.imagej</groupId>
 	<artifactId>ij_ellipse_split</artifactId>
-	<version>0.3.9</version>
+	<version>0.3.10</version>
 	<packaging>jar</packaging>
  
 	<name>Combination of Watershed and Ellipse Fitting for ImageJ</name>

@@ -136,7 +136,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 				results.addValue("Length short axis", e.getLengthShortAxis()*2);
 				results.addValue("Aspect ratio", 1.0/e.getAspectRatio());
 				results.addValue("Rotation angle", e.getRotationAngle());
-				results.addValue("R", e.getRValue());
+				//results.addValue("R", e.getRValue());
 				//IJ.log("Distance: " + e.shortestDistanceToPoint(0, 0));
 				
 			}
@@ -170,11 +170,19 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		}else{
 			ipForBlobDetection = splittedImage.getImageStack().getProcessor(ip.getSliceNumber());
 		}
-
+		
 		
 		ManyBlobs mb = new ManyBlobs(new ImagePlus("",ipForBlobDetection));
 		mb.setBackground(0);
 		mb.findConnectedComponents();
+		
+		ArrayList<Blob> blobsOnEdges = new ArrayList<Blob>();
+		for (Blob blob : mb) {
+			if(blob.isOnEdge(ipForBlobDetection)){
+				blobsOnEdges.add(blob);
+			}
+		}
+		mb.removeAll(blobsOnEdges);
 		
 		ImageCalculator calculateImages = new ImageCalculator();
 		ImagePlus extractedSeparatorsImp = calculateImages.run("XOR create",new ImagePlus("",ipForBlobDetection) , origImp);	
