@@ -62,7 +62,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 	private boolean useSplitImage;
 	private boolean removeOnEdge;
 	private ArrayList<ManyEllipses> allEllipses;
-	private ImagePlus splittedImage;
+	private ImagePlus splitImage;
 	private ImagePlus imp;
 	private ResultsTable results;
 	private ResultsTableSelectionDrawer rtsd;
@@ -164,12 +164,12 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		ImagePlus origImp = new ImagePlus("",ip.duplicate());
 		ImageProcessor ipForBlobDetection;
 		if(useSplitImage==false){
-			splittedImage = new ImagePlus("", ip.duplicate());
+			splitImage = new ImagePlus("", ip.duplicate());
 			EDM watershedEDM = new EDM();
-			watershedEDM.toWatershed(splittedImage.getProcessor());
-			ipForBlobDetection = splittedImage.getProcessor();
+			watershedEDM.toWatershed(splitImage.getProcessor());
+			ipForBlobDetection = splitImage.getProcessor();
 		}else{
-			ipForBlobDetection = splittedImage.getImageStack().getProcessor(ip.getSliceNumber());
+			ipForBlobDetection = splitImage.getImageStack().getProcessor(ip.getSliceNumber());
 		}
 		
 		
@@ -384,17 +384,17 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 
 	@Override
 	public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
-		splittedImage=null;
+		splitImage=null;
 		this.imp = imp;
 		GenericDialog gd = new GenericDialog("Ellipse Split");
 		int windowNumber = WindowManager.getImageTitles().length;
-		String[] splittedImageChoice = new String[windowNumber+1];
-		splittedImageChoice[0] = "Use standard watershed";
+		String[] splitImageChoice = new String[windowNumber+1];
+		splitImageChoice[0] = "Use standard watershed";
 		for(int i = 1; i < windowNumber+1; i++){
-			splittedImageChoice[i] = WindowManager.getImageTitles()[i-1];
+			splitImageChoice[i] = WindowManager.getImageTitles()[i-1];
 		}
 		
-		gd.addChoice("Binary splitted image", splittedImageChoice, splittedImageChoice[0]);
+		gd.addChoice("Binary splitted image", splitImageChoice, splitImageChoice[0]);
 		gd.addCheckbox("Add_to_manager", true);
 		gd.addCheckbox("Add_to_results_table", true);
 		gd.addCheckbox("Remove blobs on edge", false);
@@ -424,7 +424,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		useSplitImage = false;
 		if(choiceIndex>0){
 			useSplitImage = true;
-			splittedImage=WindowManager.getImage(splittedImageChoice[choiceIndex]);
+			splitImage=WindowManager.getImage(splitImageChoice[choiceIndex]);
 		}
 		return IJ.setupDialog(imp, FLAGS);
 	}
@@ -470,10 +470,10 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 			results.reset();
 		}
 		int windowNumber = WindowManager.getImageTitles().length;
-		String[] splittedImageChoice = new String[windowNumber+1];
-		splittedImageChoice[0] = "Use standard watershed";
+		String[] splitImageChoice = new String[windowNumber+1];
+		splitImageChoice[0] = "Use standard watershed";
 		for(int i = 1; i < windowNumber+1; i++){
-			splittedImageChoice[i] = WindowManager.getImageTitles()[i-1];
+			splitImageChoice[i] = WindowManager.getImageTitles()[i-1];
 		}
 		
 		int choiceIndex = gd.getNextChoiceIndex();
@@ -489,7 +489,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		useSplitImage = false;
 		if(choiceIndex>0){
 			useSplitImage = true;
-			splittedImage=WindowManager.getImage(splittedImageChoice[choiceIndex]);
+			splitImage=WindowManager.getImage(splitImageChoice[choiceIndex]);
 		}
 		
 		return !gd.invalidNumber();
