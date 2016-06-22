@@ -394,7 +394,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 			splittedImageChoice[i] = WindowManager.getImageTitles()[i-1];
 		}
 		
-		gd.addChoice("Binary splitted image", splittedImageChoice, splittedImageChoice[0]);
+		gd.addChoice("Binary split image", splittedImageChoice, splittedImageChoice[0]);
 		gd.addCheckbox("Add_to_manager", true);
 		gd.addCheckbox("Add_to_results_table", true);
 		gd.addCheckbox("Remove blobs on edge", false);
