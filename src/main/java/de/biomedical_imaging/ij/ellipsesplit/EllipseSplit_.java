@@ -133,6 +133,7 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 				results.addValue("Label",e.getLabel());
 				results.addValue("X", e.getX());
 				results.addValue("Y", e.getY());
+				results.addValue("Area", Math.PI*e.getLengthLongAxis()*e.getLengthShortAxis());
 				results.addValue("Length long axis", e.getLengthLongAxis()*2);
 				results.addValue("Length short axis", e.getLengthShortAxis()*2);
 				results.addValue("Aspect ratio", 1.0/e.getAspectRatio());
