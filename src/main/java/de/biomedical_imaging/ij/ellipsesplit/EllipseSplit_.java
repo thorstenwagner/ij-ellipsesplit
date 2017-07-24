@@ -108,6 +108,8 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 		// Split ellipses
 		ManyEllipses ellipses = splitAndFitEllipse(ip, addToManager, addToResultsTable, merge,removeOnEdge, overlappingThreshold);
 	
+	
+		
 		// Output
 		RoiManager  rm = RoiManager.getInstance();
 		if(rm==null && addToManager){
@@ -218,7 +220,11 @@ public class EllipseSplit_ implements ExtendedPlugInFilter, DialogListener {
 					Double.isNaN(e.getLengthShortAxis()) ||
 					Double.isNaN(e.getAspectRatio()) ||
 					Double.isNaN(e.getRotationAngle()) ||
-					1.0/e.getAspectRatio() > 100){
+					1.0/e.getAspectRatio() > 100 ||
+					e.getX()<0 ||
+					e.getX()>ip.getWidth() ||
+					e.getY()<0 ||
+					e.getY()>ip.getHeight()){
 				ellipses.remove(i);
 				i--;
 			}
