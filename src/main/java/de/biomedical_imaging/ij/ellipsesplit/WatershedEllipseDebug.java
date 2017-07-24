@@ -23,6 +23,7 @@
 
 package de.biomedical_imaging.ij.ellipsesplit;
 
+import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 
@@ -41,7 +42,7 @@ public class WatershedEllipseDebug {
 		ImagePlus ip = new ImagePlus(url.getPath());
 		ip.show();
 		
-		//plugin.setup("", IJ.getImage());
-		//plugin.run(IJ.getImage().getProcessor());
+		plugin.setup("", ip);
+		plugin.run(ip.getProcessor());
 	}
 }
